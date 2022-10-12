@@ -30,6 +30,17 @@ uintptr_t il2cpp::il_ParseAddress(std::fstream& f)
 
 	return NULL;
 }
+std::string il2cpp::il_ParseName(std::fstream& f)
+{
+	std::string substr = fs::F_ReadUntil(f, ',');
+
+	substr = substr.substr(substr.find(": ") + 3);
+	substr = substr.substr(0, substr.find('"'));
+
+	return substr;
+	
+
+}
 void il2cpp::il_FindValue(il2cpp_value* val)
 {
 	val->success = il_FindValue2(val);
@@ -61,21 +72,31 @@ bool il2cpp::il_FindValue2(il2cpp_value* val)
 		return false;
 	}
 
-	saved_data data;
-	
 	fs::F_ReadUntil(f, '[');
 	std::string addr_str;
 
-	
-	fs::F_ReadUntil(f, '{');
+	while(f.good() && !f.eof()){
 
-	uintptr_t addr = il_ParseAddress(f);
-	
-	if (!addr)
-		printf("failure to read address\n");
-	else 
-		printf("good: %u", addr);
-	
+		fs::F_ReadUntil(f, '{');
+
+		uintptr_t addr = il_ParseAddress(f);
+		std::string name = il_ParseName(f);
+
+		if (!addr)
+			printf("failure to read address\n");
+		else
+			printf("address: %u\n", addr);
+
+		printf("name: %s\n", name.c_str());
+
+		if (!name.compare(val->input_value.search_keyword)) {
+			val->output_value.value = addr;
+			val->output_value.string = name;
+			return true;
+
+		}
+
+	}
 	fs::F_CloseFile(f);
 
 	return true;

@@ -32,6 +32,7 @@ namespace il2cpp
 	bool il_FindValue2(il2cpp_value *val);
 	void il_FindValue(il2cpp_value* val);
 	uintptr_t il_ParseAddress(std::fstream& f);
+	std::string il_ParseName(std::fstream& f);
 
 }
 
